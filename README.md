@@ -3,6 +3,14 @@
 
 ## App Framework Subteam
 
+```
+python3 controls_dash_plotly_map.py
+
+or 
+
+python3 dash_plotly_map.py
+```
+
 
 Paths we investigated: 
 
