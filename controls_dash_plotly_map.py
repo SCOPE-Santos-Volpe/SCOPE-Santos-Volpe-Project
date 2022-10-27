@@ -13,6 +13,8 @@ import numpy as np
 import plotly.express as px
 import geopandas as gpd
 import shapely.geometry
+from dash import Dash, dcc, html
+import dash_table
 
 
 fars_df = pd.read_csv("FARS2020NationalCSV/accident.CSV", encoding_errors='ignore')
@@ -56,13 +58,16 @@ api_token = "pk.eyJ1IjoibGlsb2hlaW5yaWNoIiwiYSI6ImNsOGR3ZmtzdjFldTMzb214cGY3OGtv
 
 
 # creates an empty scattermapbox, so it doesn't plot anything to start
-fig = go.Figure(go.Scattermapbox())
+#fig = go.Figure(go.Scattermapbox())
+
+quakes = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/earthquakes-23k.csv')
+fig = go.Figure(go.Densitymapbox(lat=quakes.Latitude, lon=quakes.Longitude, z=quakes.Magnitude, radius=10))
 
 # sets attributes of the plot
 fig.update_layout(
     # hovermode='closest', # not sure what this does
     mapbox_accesstoken=api_token,
-    height = 650, width = 1200, # set the window size
+    height = 500, width = 800, # set the window size
     title='FARS 2020 Crashes', # title of window
     title_font_size = 18, 
     font_size=16, 
@@ -118,8 +123,11 @@ fig.update_layout(
     ],
 )
 
+#quakes = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/earthquakes-23k.csv')
+#fig = go.Figure(go.Densitymapbox(lat=quakes.Latitude, lon=quakes.Longitude, z=quakes.Magnitude, radius=10))
 
-fig.update_layout(font_size=16, title={'xanchor': 'center','yanchor': 'top', 'y':0.9, 'x':0.5,}, title_font_size = 18, mapbox_accesstoken=api_token)
+fig.update_layout(font_size=16, title={'xanchor': 'center','yanchor': 'top', 'y':1.0, 'x':0.5,}, title_font_size = 18, mapbox_accesstoken=api_token, legend = dict(itemsizing = 'constant'), margin = dict(t=20, b=0, l=0, r=0))
+
 
 
 # fig.update_traces(text='lat', hovertextsrc="CITYNAME", # hoverinfo hoverlabel hoversrc hovertext hovertemplate hovertemplatesrc hovertextsrc hoverinfosrc
@@ -131,11 +139,57 @@ fig.update_layout(font_size=16, title={'xanchor': 'center','yanchor': 'top', 'y'
 
 
 
+
+
+
 # DASH CODE
 # Build App
 app = JupyterDash(__name__)
-app.layout = dash.html.Div(
-    [
+
+
+app.layout = html.Div(
+            className="content",
+            children=[
+		html.Div(
+		    className="left_menu",
+		    children=[
+			html.Div(
+			    'This is the left menu'
+			),
+		    ]
+		),
+
+		html.Div(
+		    className="right_content",
+		    children=[
+			html.Div(
+			    className="top_metrics",
+			    children=[
+			    'This is top metrics'
+			    ]
+			),
+			html.Div(
+			    'This down top metrics'
+			),
+		    ]
+		),
+		]
+		)
+
+
+
+app.layout = dash.html.Div([
+    dash.html.H1('Hello'),
+    dash.html.Div([dash.html.Div('Div', style={'color': 'blue', 'fontSize': 14}), dash.html.P('Example P', className='my-class', id='my-p-element')], style={'marginBottom': 50, 'marginTop': 25}),
+    
+
+    	dash.html.P('Hello2'),
+    	dash.html.Div([
+        	dcc.Checklist(['New York City', 'Montréal', 'San Francisco'], ['Montréal', 'San Francisco']),
+        	dcc.RadioItems(['New York City', 'Montréal', 'San Francisco'], 'Montréal'),
+        ]),
+    #],[
+        
         # can turn this back on to have checkbox to show window lat/lon info onscreen
         # dash.dcc.Checklist(
         #     options=[{"label":"refesh", "value":"yes"}],
@@ -151,10 +205,64 @@ app.layout = dash.html.Div(
                 "lat": [],
                 "lon": [],
             },
-        ),
+        )
     ]
 )
     
+
+app.layout = html.Div([
+
+    # first row
+    html.Div(children=[
+
+        # first column of first row
+        html.Div(children=[
+
+            dcc.RadioItems(id = 'radio-item-1',
+                           options = [dict(label = 'option A', value = 'A'),
+                                      dict(label = 'option B', value = 'B'),
+                                      dict(label = 'option C', value = 'C')],
+                            value = 'A',
+                            labelStyle={'display': 'block'}),
+
+            html.P(id = 'text-1',
+                   children = 'First paragraph'),
+
+        ], style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
+
+        # second column of first row
+        html.Div(children=[
+
+            dcc.RadioItems(id = 'radio-item-2',
+                       options = [dict(label = 'option 1', value = '1'),
+                                  dict(label = 'option 2', value = '2'),
+                                  dict(label = 'option 3', value = '3')],
+                       value = '1',
+                       labelStyle={'display': 'block'}),
+
+            html.P(id='text-2',
+                   children='Second paragraph'),
+
+        ], style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
+
+        # third column of first row
+        html.Div(children=[
+            #html.Div(dcc.Graph(id = 'main-graph',
+            #                   figure = figure)),
+          
+            dash.dcc.Graph(id="mapbox_fig", figure=fig),
+        ], style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
+    ], className='row'),
+
+    # second row
+    html.Div(children=[
+        html.Div(dash_table.DataTable(id = 'main-table',
+                                      columns = [{"name": i, "id": i} for i in fars_df.columns],
+                                      data = fars_df.to_dict('records'),
+                                      style_table={'margin-left': '3vw', 'margin-top': '3vw'})),
+    ], className='row'),
+])
+
 
 @app.callback(
     Output("points-store", "data"),
