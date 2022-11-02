@@ -1,5 +1,5 @@
 To Run:
 
 ```
-python3 ____
+browse index.html
 ```
