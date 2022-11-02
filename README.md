@@ -3,18 +3,9 @@
 
 ## App Framework Subteam
 
-```
-python3 controls_dash_plotly_map.py
-
-or 
-
-python3 dash_plotly_map.py
-```
-
-
 Paths we investigated: 
 
-- Using streamlite versus dash for creating the webapp using python
+- Using streamlit versus dash for creating the webapp using python
 
 - Whether to use some python library, leaflet.js, plotly.js, or plot.ly (python) to code map interactivity features
 
