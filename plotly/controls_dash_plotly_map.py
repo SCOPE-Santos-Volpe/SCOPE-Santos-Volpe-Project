@@ -1,4 +1,4 @@
-""" 
+"""
 This example is based on: https://stackoverflow.com/questions/71375339/plotly-mapbox-get-the-geometry-of-current-view-zoom-level
 """
 
@@ -40,9 +40,9 @@ api_token = "pk.eyJ1IjoibGlsb2hlaW5yaWNoIiwiYSI6ImNsOGR3ZmtzdjFldTMzb214cGY3OGtv
 
 # # this creates a scattermapbox directly rather than as a layer, so it always plots. this isn't what we want i think.
 # # https://plotly.github.io/plotly.py-docs/generated/plotly.express.scatter_mapbox.html
-# fig = px.scatter_mapbox(fars_df, 
-#                 lat="lat", lon="lon", 
-#                 labels="FARS 2020 crashes", 
+# fig = px.scatter_mapbox(fars_df,
+#                 lat="lat", lon="lon",
+#                 labels="FARS 2020 crashes",
 #                 zoom=3,
 #                 height = 600, width = 900,
 #                 title='FARS 2020 Crashes',
@@ -50,8 +50,8 @@ api_token = "pk.eyJ1IjoibGlsb2hlaW5yaWNoIiwiYSI6ImNsOGR3ZmtzdjFldTMzb214cGY3OGtv
 #                 # color="lat",
 #                 # text="lat",
 #                 # size="lat",
-#                 hover_name="CITYNAME", 
-#                 hover_data=["COUNTYNAME", "STATENAME"], 
+#                 hover_name="CITYNAME",
+#                 hover_data=["COUNTYNAME", "STATENAME"],
 #                 color_discrete_sequence=["fuchsia"],
 #                 opacity=0.0,
 #                 )
@@ -60,8 +60,8 @@ api_token = "pk.eyJ1IjoibGlsb2hlaW5yaWNoIiwiYSI6ImNsOGR3ZmtzdjFldTMzb214cGY3OGtv
 # creates an empty scattermapbox, so it doesn't plot anything to start
 #fig = go.Figure(go.Scattermapbox())
 quakes = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/earthquakes-23k.csv')
-#fig = go.Figure(go.Densitymapbox(lat=quakes.Latitude, lon=quakes.Longitude, z=quakes.Magnitude, radius=10))
-fig = go.Figure(go.Densitymapbox(lat=fars_df["lat"], lon=fars_df["lon"], z=fars_df["PERSONS"], radius=20))
+fig = go.Figure(go.Densitymapbox(lat=quakes.Latitude, lon=quakes.Longitude, z=quakes.Magnitude, radius=10))
+# fig = go.Figure(go.Densitymapbox(lat=fars_df["lat"], lon=fars_df["lon"], z=fars_df["PERSONS"], radius=20))
 
 # sets attributes of the plot
 fig.update_layout(
@@ -69,8 +69,8 @@ fig.update_layout(
     mapbox_accesstoken=api_token,
     height = 500, width = 1000, # set the window size
     title='FARS 2020 Crashes', # title of window
-    title_font_size = 18, 
-    font_size=16, 
+    title_font_size = 18,
+    font_size=16,
     mapbox_style="open-street-map", # set the map style. basic, light, dark, etc.
     mapbox=dict(
         accesstoken=api_token,
@@ -84,7 +84,7 @@ fig.update_layout(
 
 #fig = go.Figure(go.Scattermapbox(mode = "markers+lines",lon = [10, 20, 30],lat = [10, 20,30],marker = {'size': 10}))
 #fig.add_trace(go.Scattermapbox(mode = "markers+lines",lon = [-80, -95, -110], lat = [40, 30,50],marker = {'size': 10}))
-fig.add_trace(go.Scattermapbox(mode = "lines",lon = [-96.5,-91,-91,-98,-96.5], lat = [43.5,43.5,48,48,43.5],marker = {'size': 10}))
+fig.add_trace(go.Scattermapbox(mode = "lines",lon = [-96.5,-91,-91,-97.5,-96.5], lat = [43.5,43.5,48,49,43.5],marker = {'size': 10}))
 
 
 # creates layers to plot
@@ -107,13 +107,13 @@ fig.update_layout(
                     shapely.geometry.Point, axis=1)
             ).__geo_interface__,
             "name": "fars1",
-            
+
         },
         {
             "circle": {"radius": 6},
-            "color":"rgb(80,0,255)",
+            "color":"rgb(0,0,255)",
             "minzoom": 6,
-            "maxzoom": 8,
+            "maxzoom": 9,
             "source": gpd.GeoSeries(
                 fars_df.loc[:, ["lon", "lat"]].apply(
                     shapely.geometry.Point, axis=1)
@@ -123,9 +123,9 @@ fig.update_layout(
         },
         {
             "circle": {"radius": 9},
-            "color":"rgb(160,0,255)",
-            "minzoom": 8,
-            "maxzoom": 10,
+            "color":"rgb(0,0,255)",
+            "minzoom": 9,
+            "maxzoom": 14,
             "source": gpd.GeoSeries(
                 fars_df.loc[:, ["lon", "lat"]].apply(
                     shapely.geometry.Point, axis=1)
@@ -135,8 +135,8 @@ fig.update_layout(
         },
         {
             "circle": {"radius": 12},
-            "color":"rgb(200,0,200)",
-            "minzoom": 10,
+            "color":"rgb(0,0,200)",
+            "minzoom": 14,
             # "maxzoom": 8,
             "source": gpd.GeoSeries(
                 fars_df.loc[:, ["lon", "lat"]].apply(
@@ -145,18 +145,18 @@ fig.update_layout(
             "name": "fars4",
             "opacity": 0.8,
         },
-        { # try adding datapoints for 10,000 points only to show how layers and colors can be used
-            "circle": {"radius": 3},
-            "color":"rgb(50,50,50)",
-            "minzoom": 4,
-            "maxzoom": 8,
-            "source": gpd.GeoSeries(
-                fars_df[:10000].loc[:, ["lon", "lat"]].apply(
-                    shapely.geometry.Point, axis=1)
-            ).__geo_interface__,
-            "name": "fars10k",
-            "opacity": 0.3,
-        },
+        # { # try adding datapoints for 10,000 points only to show how layers and colors can be used
+        #     "circle": {"radius": 3},
+        #     "color":"rgb(50,50,50)",
+        #     "minzoom": 4,
+        #     "maxzoom": 8,
+        #     "source": gpd.GeoSeries(
+        #         fars_df[:10000].loc[:, ["lon", "lat"]].apply(
+        #             shapely.geometry.Point, axis=1)
+        #     ).__geo_interface__,
+        #     "name": "fars10k",
+        #     "opacity": 0.3,
+        # },
     ],
 )
 
@@ -227,7 +227,7 @@ app.layout = dash.html.Div([
             },
         )
     ])
-    
+
 
 app.layout = html.Div([
     # first row
@@ -245,7 +245,7 @@ app.layout = html.Div([
 
             html.P(id = 'text-1',
                    children = 'Checklist boxes'),
-                   
+
            dcc.Checklist(id = 'checklist_item',
                options = [dict(label = 'New York City', value = '1'),
                           dict(label = 'Montréal', value = '2'),
@@ -273,7 +273,7 @@ app.layout = html.Div([
         html.Div(children=[
             #html.Div(dcc.Graph(id = 'main-graph',
             #                   figure = figure)),
-          
+
             dash.dcc.Graph(id="mapbox_fig", figure=fig),
         ], style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
     ], className='row'),
@@ -303,9 +303,9 @@ def mapbox_cb(mapbox_cfg, radio_item, checklist_item): #, refresh): # can turn t
     #     refresh = refresh[0]=="yes"
     # except Exception:
     #     refresh = False
-    
+
     print("outputs", mapbox_cfg, radio_item, checklist_item)
-    
+
     if mapbox_cfg and "mapbox.zoom" in mapbox_cfg.keys(): # and refresh:  # can turn this back on to have checkbox to show window lat/lon info onscreen
         bbox = np.array(mapbox_cfg["mapbox._derived"]["coordinates"])
         # bbox = bbox * .8
@@ -334,7 +334,7 @@ app.clientside_callback(
         fig.data[1]['lon'] = data['lon'];
         fig.layout.datarevision = fig.layout.datarevision + 1;
         /* return fig; */
-        return JSON.parse(JSON.stringify(fig)); 
+        return JSON.parse(JSON.stringify(fig));
     }
     """,
     Output("mapbox_fig", "figure"),

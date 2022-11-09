@@ -4,10 +4,10 @@
  */
 
 // magnification with which the map will start
-const zoom = 18;
+const zoom = 3;
 // coordinates
-const lat = 52.22977;
-const lng = 21.01178;
+const lat = 45.0;
+const lng = -93.25;
 
 const osmLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
 const cartoDB = '<a href="http://cartodb.com/attributions">CartoDB</a>';
@@ -24,28 +24,30 @@ const landMap = L.tileLayer(landUrl, { attribution: cartoAttrib });
 // config map
 let config = {
   layers: [osmMap],
-  minZoom: 7,
+  minZoom: 3,
   maxZoom: 18,
   // fullscreenControl: true,
 };
 
 // coordinate array with popup text
+
+
 const pointsA = [
-  [52.230020586193795, 21.01083755493164, "point A1"],
-  [52.22924516170657, 21.011320352554325, "point A2"],
-  [52.229511304688444, 21.01270973682404, "point A3"],
-  [52.23040500771883, 21.012146472930908, "point A4"],
+  [44.960020586193795,  -93.25083755493164, "point A1"],
+  [44.95924616170657,   -93.251320352554325, "point A2"],
+  [44.959511304688444,  -93.25270973682404, "point A3"],
+  [44.96040500771883,   -93.252146472930908, "point A4"],
 ];
 
 const pointsB = [
-  [52.229314161892106, 21.012055277824405, "point B1"],
-  [52.22950144756943, 21.01193726062775, "point B2"],
-  [52.22966573260081, 21.011829972267154, "point B3"],
-  [52.2298333027065, 21.011744141578678, "point B4"],
-  [52.2299680154701, 21.01164758205414, "point B5"],
-  [52.23012572745442, 21.011583209037784, "point B6"],
-  [52.230276867580336, 21.01143836975098, "point B7"],
-  [52.23046414919644, 21.011341810226444, "point B8"],
+  [44.959314161892106,  -93.252055277824405, "point B1"],
+  [44.95950144756943,   -93.25193726062775, "point B2"],
+  [44.95966573260081,   -93.251829972267154, "point B3"],
+  [44.9598333027065,    -93.251744141578678, "point B4"],
+  [44.9599680154701,    -93.25164758205414, "point B5"],
+  [44.96012572746442,   -93.251583209037784, "point B6"],
+  [44.960276867580336,  -93.25143836975098, "point B7"],
+  [44.96046414919644,   -93.251341810226444, "point B8"],
 ];
 
 
@@ -87,10 +89,116 @@ const allMarkers = new L.FeatureGroup();
 
 // adding markers to the layer pointsA
 for (let i = 0; i < pointsA.length; i++) {
-  // marker = L.marker([pointsA[i][0], pointsA[i][1]]).bindPopup(pointsA[i][2]);
-  marker = L.circleMarker([pointsA[i][0], pointsA[i][1]], {radius: 10, color: '#FF0000'}).bindPopup(pointsA[i][2]);
+  // var marker = L.marker([pointsA[i][0], pointsA[i][1]]).bindPopup(pointsA[i][2]);
+  var marker = L.circleMarker([pointsA[i][0], pointsA[i][1]], {radius: 10, color: '#FF0000'}).bindPopup(pointsA[i][2]);
   pA.addLayer(marker);
 }
+
+
+// // START OF CSV WORK LILO
+
+
+// // --------------------------------------------------
+// // get geojson from file
+
+// // function openFile(event) {
+//   // const input = event.target;
+//   // const input = '../FARS2020NationalCSV/accident.CSV'
+//   const inputFile = 'state_shp.zip'
+//   var input = new File([""], "input");
+
+//   const reader = new FileReader();
+//   // reader.onload = function () {
+//     const result = reader.result;
+//     const geojson = JSON.parse(result);
+
+//     Notiflix.Notify.info("FARS has been loaded");
+
+//     setGeojsonToMap(geojson);
+//   // };
+//   reader.readAsText(input.files[0]);
+// // }
+
+
+// var accident_markers = new Array();
+
+
+
+// // --------------------------------------------------
+// // get geojson from file
+
+// function openFile(event) {
+//   const input = event.target;
+
+//   const reader = new FileReader();
+//   reader.onload = function () {
+//     const result = reader.result;
+//     const geojson = JSON.parse(result);
+
+//     Notiflix.Notify.info("The data has been loaded from the file");
+
+//     setGeojsonToMap(geojson);
+//   };
+//   reader.readAsText(input.files[0]);
+// }
+
+
+
+var marker = L.circleMarker([1, 2]);
+marker.addTo(map);
+console.log("heeeellllo");
+
+
+d3.csv('https://github.com/Santos-Volpe-SCOPE/Santos-Volpe-SCOPE-Project/blob/app-framework/FARS2020NationalCSV/accident.CSV', function(data) {
+  console.log("inside d3 statement");
+
+});
+
+
+
+// d3.csv('../FARS2020NationalCSV/accident.CSV', function(data) {
+//   console.log("inside d3 statement");
+//   // console.log(data);
+
+//   // for (var i = 0; i < data.length; i++) {
+//   //   console.log(data[i].LATITUDE);
+//   //   console.log(data[i].LONGITUD);
+
+//   //   // var marker = L.circleMarker([data[i].LATITUDE, data[i].LONGITUD], {radius: 10, color: '#FF0000'}).bindPopup(data[i].SYSNAME);
+//   //   // pA.addLayer(marker);
+//   // }
+  
+//   // var marker = L.circleMarker([10, 2]);
+//   // marker.addTo(map);
+//   // pA.addLayer(marker);
+
+//   // Notiflix.Notify.info("FARS has been loaded");
+// });
+
+
+
+
+
+// // // Read markers data from data.csv
+//   $.get('../FARS2020NationalCSV/accident.csv', function(csvString) {
+// //     // Use PapaParse to convert string to array of objects
+//     // var data = Papa.parse(csvString, {header: true, dynamicTyping: true}).data;
+//
+//       var mm = L.circleMarker([1, 2]);
+//       mm.addTo(map);
+//       pA.addLayer(mm);
+//
+// //     // For each row in data, create a marker and add it to the map
+// //     // For each row, columns `Latitude`, `Longitude`, and `Title` are required
+// //     for (var i in data) {
+// //       var row = data[i];
+// //       var marker = L.marker([row.LATITUDE, row.LONGITUD], {
+// //         opacity: 1
+// //       }).bindPopup(row.Title);
+// //       marker.addTo(map);
+// //     }
+//   });
+
 
 // adding markers to the layer pointsB
 for (let i = 0; i < pointsB.length; i++) {
@@ -490,7 +598,7 @@ function setGeojsonToMap(geojson) {
     style: function (feature) {
       return {
         color: "red",
-        weight: 2,
+        weight: 1,
       };
     },
     pointToLayer: (feature, latlng) => {
