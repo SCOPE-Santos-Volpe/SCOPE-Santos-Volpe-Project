@@ -97,44 +97,34 @@ for (let i = 0; i < pointsA.length; i++) {
 
 
 // // START OF CSV WORK LILO
-
 // var accident_markers = new Array();
-console.log("heeeellllo");
-
+console.log("hello");
 d3.csv('https://raw.githubusercontent.com/Santos-Volpe-SCOPE/Santos-Volpe-SCOPE-Project/app-framework/FARS2020NationalCSV/accident.csv', function(data) {
   // console.log(data);
   console.log(data.length);
-
-  // for (var i = 590; i < 600; i++) { 
-  //   console.log("index =", i);
-  //   console.log("  lat =", data[i].LATITUDE);
-  //   console.log("  lon =", data[i].LONGITUD);
-  // }
-
-  for (var i = 0; i < 2000; i++) { 
-  // for (var i = 0; i < data.length; i++) {
+  
+  // for (var i = 0; i < 2000; i++) { 
+  for (var i = 0; i < data.length; i++) {
     // console.log("index = ", i);
-
-  // //   console.log(data[i]);
+    // console.log(data[i]);
     // console.log(data[i].LATITUDE);
     // console.log(data[i].LONGITUD);
 
-    // var marker = L.circleMarker([1, 2]);
-    // marker.addTo(map);
-
     var row = data[i];
       
-    // // var marker = L.marker([row.LATITUDE, row.LONGITUD], {
-      // var marker = L.circleMarker([row.LATITUDE, row.LONGITUD], {
-      //   opacity: 1, radius: 1, color: "red"
-      // }).bindPopup(row.STATENAME);
-      // marker.addTo(map);
+    // ways to make markers:
+    // var marker = L.marker([row.LATITUDE, row.LONGITUD], {
+    // var marker = L.circle( ... )
+    // var marker = L.circleMarker([row.LATITUDE, row.LONGITUD], {opacity: 1, radius: 1, color: "red"}).bindPopup(row.STATENAME);
+    // marker.addTo(map);
 
-    if (row.LATITUDENAME != "Not Available" & row.LONGITUDNAME != "Not Available" & row.LATITUDENAME != "Not Reported" & row.LONGITUDNAME != "Not Reported" & row.LATITUDENAME != "Reported as Unknown" & row.LONGITUDNAME != "Reported as Unknown"){
-      var marker = L.circleMarker([row.LATITUDE, row.LONGITUD], {radius: 1, opacity: 1, color: '#FF0000'}).bindPopup(row.STATENAME);
-      // var marker = L.circle([row.LATITUDE, row.LONGITUD], {radius: 1, opacity: 1, color: '#FF0000'}).bindPopup(row.STATENAME);
-      pC.addLayer(marker);
-      // accident_markers.push(marker)
+    if (row.STATENAME == "Alabama" | row.STATENAME == "Washington"){
+      if (row.LATITUDENAME != "Not Available" & row.LONGITUDNAME != "Not Available" & row.LATITUDENAME != "Not Reported" & row.LONGITUDNAME != "Not Reported" & row.LATITUDENAME != "Reported as Unknown" & row.LONGITUDNAME != "Reported as Unknown"){
+        var marker = L.circleMarker([row.LATITUDE, row.LONGITUD], {radius: 1, opacity: 1, color: '#FF0000'}).bindPopup(row.STATENAME);
+        // var marker = L.circle([row.LATITUDE, row.LONGITUD]); //, {radius: 1, opacity: 1, color: '#red'});
+        pC.addLayer(marker);
+        // accident_markers.push(marker)
+      }
     }
   }
 });
@@ -157,12 +147,6 @@ for (let i = 0; i < pointsB.length; i++) {
   pB.addLayer(marker);
 }
 
-// // object with layers
-// const overlayMaps = {
-//   "point A": pA,
-//   "point B": pB,
-//   "points FARS": pC,
-// };
 
 // centering a group of markers
 map.on("layeradd layerremove", function () {
