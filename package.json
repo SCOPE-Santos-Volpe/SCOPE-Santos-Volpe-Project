@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "jquery-csv": "^1.0.21"
+  }
+}
