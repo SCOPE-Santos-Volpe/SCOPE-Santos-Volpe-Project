@@ -1,8 +1,3 @@
-/* eslint-disable no-undef */
-/**
- * Adding one marker
- */
-
 // magnification with which the map will start
 const zoom = 3;
 // coordinates
@@ -26,6 +21,7 @@ let config = {
   layers: [osmMap],
   minZoom: 3,
   maxZoom: 18,
+  preferCanvas: true, // helps to fix slowness by plotting points on a canvas rather than individual layers
   // fullscreenControl: true,
 };
 
@@ -51,8 +47,6 @@ const pointsB = [
   [44.96046414919644,   -93.251341810226444, "point B8"],
 ];
 
-
-
 // calling map
 const map = L.map("map", config).setView([lat, lng], zoom);
 
@@ -63,7 +57,6 @@ var baseLayers = {
 
 // L.control.layers(baseLayers).addTo(map);
 L.control.layers(baseLayers, null, {collapsed:false}).addTo(map); // makes layer control not collapse, stay expanded
-
 
 
 // // heatmap
@@ -91,17 +84,25 @@ const allMarkers = new L.FeatureGroup();
 // adding markers to the layer pointsA
 for (let i = 0; i < pointsA.length; i++) {
   // var marker = L.marker([pointsA[i][0], pointsA[i][1]]).bindPopup(pointsA[i][2]);
-  var marker = L.circleMarker([pointsA[i][0], pointsA[i][1]], {radius: 10, color: '#FF0000'}).bindPopup(pointsA[i][2]);
+  var marker = L.circleMarker([pointsA[i][0], pointsA[i][1]], {radius: 3, color: '#FF0000'}).bindPopup(pointsA[i][2]);
   pA.addLayer(marker);
 }
 
 
 // // START OF CSV WORK LILO
-// var accident_markers = new Array();
-console.log("hello");
+// // try using leafet-markers-canvas plugin -- it's better than leaflet-canvas-markers
+// var markersCanvas = new L.MarkersCanvas();
+// markersCanvas.addTo(map);
+// var icon = L.icon({ // need to specify an icon even if it's a circle
+//   iconUrl: "marker.png",
+//   iconSize: [2, 2],
+//   iconAnchor: [0, 0],
+// });
+// var fars_markers = [];
+
+var FARS_renderer = L.canvas({ padding: 0.5 }); // helps to fix slowness by plotting points on a canvas rather than individual layers
 d3.csv('https://raw.githubusercontent.com/Santos-Volpe-SCOPE/Santos-Volpe-SCOPE-Project/app-framework/FARS2020NationalCSV/accident.csv', function(data) {
-  // console.log(data);
-  console.log(data.length);
+  console.log("data.length", data.length);
   
   // for (var i = 0; i < 2000; i++) { 
   for (var i = 0; i < data.length; i++) {
@@ -118,16 +119,40 @@ d3.csv('https://raw.githubusercontent.com/Santos-Volpe-SCOPE/Santos-Volpe-SCOPE-
     // var marker = L.circleMarker([row.LATITUDE, row.LONGITUD], {opacity: 1, radius: 1, color: "red"}).bindPopup(row.STATENAME);
     // marker.addTo(map);
 
-    if (row.STATENAME == "Alabama" | row.STATENAME == "Washington"){
-      if (row.LATITUDENAME != "Not Available" & row.LONGITUDNAME != "Not Available" & row.LATITUDENAME != "Not Reported" & row.LONGITUDNAME != "Not Reported" & row.LATITUDENAME != "Reported as Unknown" & row.LONGITUDNAME != "Reported as Unknown"){
-        var marker = L.circleMarker([row.LATITUDE, row.LONGITUD], {radius: 1, opacity: 1, color: '#FF0000'}).bindPopup(row.STATENAME);
-        // var marker = L.circle([row.LATITUDE, row.LONGITUD]); //, {radius: 1, opacity: 1, color: '#red'});
-        pC.addLayer(marker);
-        // accident_markers.push(marker)
-      }
+    // if (row.STATENAME == "California") { // | row.STATENAME == "Texas"){
+    if (row.LATITUDENAME != "Not Available" & row.LONGITUDNAME != "Not Available" & row.LATITUDENAME != "Not Reported" & row.LONGITUDNAME != "Not Reported" & row.LATITUDENAME != "Reported as Unknown" & row.LONGITUDNAME != "Reported as Unknown"){
+      // var marker = L.circle([row.LATITUDE, row.LONGITUD]); //, {radius: 1, opacity: 1, color: '#red'});
+
+      // // renderer option helps to fix slowness by plotting points on a canvas rather than individual layers
+      var marker = L.circleMarker([row.LATITUDE, row.LONGITUD], {radius: 1, opacity: 1, color: '#0000FF', renderer: FARS_renderer}).bindPopup(row.STATENAME); //.addTo(map);
+      pC.addLayer(marker);
+
+      // // tried using leafet-markers-canvas plugin
+      // var marker = L.marker(
+      //   [row.LATITUDE, row.LONGITUD],
+      //   { icon }
+      // )
+      //   .bindPopup(row.STATENAME)
+      //   .on({
+      //     mouseover(e) {
+      //       this.openPopup();
+      //     },
+      //     mouseout(e) {
+      //       this.closePopup();
+      //     },
+      //   });
+      // fars_markers.push(marker);
     }
+    // }
   }
+
+// // tried using leafet-markers-canvas plugin
+// markersCanvas.addMarkers(fars_markers);
+// console.log("fars_markers", fars_markers);
+
 });
+
+
 
 // object with layers
 const overlayMaps = {
@@ -138,7 +163,6 @@ const overlayMaps = {
 
 // var layerControl = L.control.layers(baseLayers, overlayMaps).addTo(map);
 // layerControl.addOverlay(L.layerGroup(accident_markers), "FARS2020 Accidents");
-
 
 
 // adding markers to the layer pointsB
@@ -153,13 +177,15 @@ map.on("layeradd layerremove", function () {
   // Create new empty bounds
   let bounds = new L.LatLngBounds();
   // Iterate the map's layers
-  map.eachLayer(function (layer) {
-    // Check if layer is a featuregroup
-    if (layer instanceof L.FeatureGroup) {
-      // Extend bounds with group's bounds
-      bounds.extend(layer.getBounds());
-    }
-  });
+  // // DO NOT UNCOMMENT SOMETHING IN HERE BREAKS AND MAKES THINGS SLOW
+  // map.eachLayer(function (layer) {
+  //   // Check if layer is a featuregroup
+    // if (layer instanceof L.FeatureGroup) {
+    //   // Extend bounds with group's bounds
+    //   bounds.extend(layer.getBounds());
+    // }
+    // console.log("hi");
+  // });
 
   // Check if bounds are valid (could be empty)
   if (bounds.isValid()) {
@@ -219,12 +245,13 @@ new L.Control.CustomButtons(null, overlayMaps, { collapsed: false }).addTo(map);
 // coord = [52.22983, 21.011728];
 // L.marker(coord).addTo(map).bindPopup("Center Warsaw\n" + coord.join());
 
-const markerPlace = document.querySelector(".marker-position");
+// const markerPlace = document.querySelector(".marker-position");
 
 // obtaining coordinates after clicking on the map
 map.on("click", function (e) {
-  const markerPlace = document.querySelector(".marker-position");
-  markerPlace.textContent = e.latlng;
+  // const markerPlace = document.querySelector(".marker-position");
+  // markerPlace.textContent = e.latlng;
+  console.log("Clicked on", e.latlng);
 });
 
 
@@ -267,11 +294,121 @@ function randomColor() {
 }
 
 function updateInfo(north, south) {
-  markerPlace.textContent =
+  // console.log("moving the map", north, south);
+  // markerPlace.textContent =
+  var textContent = 
     south === undefined
       ? "We are moving the map..."
       : `SouthWest: ${north}, NorthEast: ${south}`;
+    console.log(textContent);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// --------------------------------------------------
+// load geojson of mpos
+
+function setGeojsonToMap(geojson) {
+  const feature = L.geoJSON(geojson, {
+    style: function (feature) {
+      return {
+        color: "red",
+        weight: 1,
+      };
+    },
+    // pointToLayer: (feature, latlng) => {
+      // if (feature.properties.type === "circle") {
+      //   return new L.circle(latlng, {
+      //     radius: feature.properties.radius,
+      //   });
+      // } else if (feature.properties.type === "circlemarker") {
+      //   return new L.circleMarker(latlng, {
+      //     radius: 10,
+      //   });
+      // } else {
+      //   return new L.Marker(latlng);
+      // }
+    // },
+    onEachFeature: function (feature, layer) {
+      // drawnItems.addLayer(layer);
+      // const coordinates = feature.geometry.coordinates.toString();
+      // const result = coordinates.match(/[^,]+,[^,]+/g);
+      // layer.bindPopup(
+      //   "<span>Coordinates:<br>" + result.join("<br>") + "</span>"
+      // );
+
+      const mpo_name = feature.properties.MPO_NAME.toString();
+      layer.bindPopup(
+        "<span>MPO Name:<br>" + mpo_name + "</span>"
+      );
+    },
+  }).addTo(map);
+  map.flyToBounds(feature.getBounds());
+}
+
+d3.json('https://raw.githubusercontent.com/Santos-Volpe-SCOPE/Santos-Volpe-SCOPE-Project/app-framework/leaflet/mpo_data/mpo_boundaries.geojson', function(data) {
+  const geojson = data;
+  setGeojsonToMap(geojson);
+  console.log("mpo boundaries loaded");
+});
+
+
+// var myStyle = {
+//   "color": "#ff7800",
+//   "weight": 5,
+//   "opacity": 0.65
+// };
+// var geojsonMarkerOptions = {
+//   radius: 8,
+//   fillColor: "#ff7800",
+//   color: "#000",
+//   weight: 1,
+//   opacity: 1,
+//   fillOpacity: 0.8
+// };
+
+// d3.json('https://raw.githubusercontent.com/Santos-Volpe-SCOPE/Santos-Volpe-SCOPE-Project/app-framework/leaflet/mpo_data/mpo_boundaries.geojson', function(data) {
+//   const geojsonFeature = data;
+//   // setGeojsonToMap(geojson);
+//   var myLayer = L.geoJSON().addTo(map);
+//   myLayer.addData(geojsonFeature, {
+//       style: myStyle,
+//       onEachFeature: onEachFeature
+//     });
+//   console.log("mpo boundaries loaded");
+
+//   function onEachFeature(feature, layer) {
+//     layer.bindPopup(feature.properties.MPO_NAME);
+//   }
+// });
+
+
+
+
+
+
+
+
 
 
 
@@ -360,228 +497,229 @@ function closeSidebar() {
 
 
 
-// --------------------------------------------------
-// Nofiflix options
 
-Notiflix.Notify.init({
-  width: "280px",
-  position: "right-bottom",
-  distance: "10px",
-});
+// // --------------------------------------------------
+// // Nofiflix options
 
-// --------------------------------------------------
-// add buttons to map
+// Notiflix.Notify.init({
+//   width: "280px",
+//   position: "right-bottom",
+//   distance: "10px",
+// });
 
-const customControl = L.Control.extend({
-  // button position
-  options: {
-    position: "topright",
-  },
+// // --------------------------------------------------
+// // add buttons to map
 
-  // method
-  onAdd: function () {
-    const array = [
-      {
-        title: "export features geojson",
-        html: "<svg class='icon-geojson'><use xlink:href='#icon-export'></use></svg>",
-        className: "export link-button leaflet-bar",
-      },
-      {
-        title: "save geojson",
-        html: "<svg class='icon-geojson'><use xlink:href='#icon-add'></use></svg>",
-        className: "save link-button leaflet-bar",
-      },
-      {
-        title: "remove geojson",
-        html: "<svg class='icon-geojson'><use xlink:href='#icon-remove'></use></svg>",
-        className: "remove link-button leaflet-bar",
-      },
-      {
-        title: "load gejson from file",
-        html: "<input type='file' id='geojson' class='geojson' accept='text/plain, text/json, .geojson' onchange='openFile(event)' /><label for='geojson'><svg class='icon-geojson'><use xlink:href='#icon-import'></use></svg></label>",
-        className: "load link-button leaflet-bar",
-      },
-    ];
+// const customControl = L.Control.extend({
+//   // button position
+//   options: {
+//     position: "topright",
+//   },
 
-    const container = L.DomUtil.create(
-      "div",
-      "leaflet-control leaflet-action-button"
-    );
+//   // method
+//   onAdd: function () {
+//     const array = [
+//       {
+//         title: "export features geojson",
+//         html: "<svg class='icon-geojson'><use xlink:href='#icon-export'></use></svg>",
+//         className: "export link-button leaflet-bar",
+//       },
+//       {
+//         title: "save geojson",
+//         html: "<svg class='icon-geojson'><use xlink:href='#icon-add'></use></svg>",
+//         className: "save link-button leaflet-bar",
+//       },
+//       {
+//         title: "remove geojson",
+//         html: "<svg class='icon-geojson'><use xlink:href='#icon-remove'></use></svg>",
+//         className: "remove link-button leaflet-bar",
+//       },
+//       {
+//         title: "load gejson from file",
+//         html: "<input type='file' id='geojson' class='geojson' accept='text/plain, text/json, .geojson' onchange='openFile(event)' /><label for='geojson'><svg class='icon-geojson'><use xlink:href='#icon-import'></use></svg></label>",
+//         className: "load link-button leaflet-bar",
+//       },
+//     ];
 
-    array.forEach((item) => {
-      const button = L.DomUtil.create("a");
-      button.href = "#";
-      button.setAttribute("role", "button");
+//     const container = L.DomUtil.create(
+//       "div",
+//       "leaflet-control leaflet-action-button"
+//     );
 
-      button.title = item.title;
-      button.innerHTML = item.html;
-      button.className += item.className;
+//     array.forEach((item) => {
+//       const button = L.DomUtil.create("a");
+//       button.href = "#";
+//       button.setAttribute("role", "button");
 
-      // add buttons to container;
-      container.appendChild(button);
-    });
+//       button.title = item.title;
+//       button.innerHTML = item.html;
+//       button.className += item.className;
 
-    return container;
-  },
-});
-map.addControl(new customControl());
+//       // add buttons to container;
+//       container.appendChild(button);
+//     });
 
-// Drow polygon, circle, rectangle, polyline
-// --------------------------------------------------
+//     return container;
+//   },
+// });
+// map.addControl(new customControl());
 
-let drawnItems = L.featureGroup().addTo(map);
+// // Drow polygon, circle, rectangle, polyline
+// // --------------------------------------------------
 
-map.addControl(
-  new L.Control.Draw({
-    edit: {
-      featureGroup: drawnItems,
-      poly: {
-        allowIntersection: false,
-      },
-    },
-    draw: {
-      polygon: {
-        allowIntersection: false,
-        showArea: true,
-      },
-    },
-  })
-);
+// let drawnItems = L.featureGroup().addTo(map);
 
-map.on(L.Draw.Event.CREATED, function (event) {
-  let layer = event.layer;
-  let feature = (layer.feature = layer.feature || {});
-  let type = event.layerType;
+// map.addControl(
+//   new L.Control.Draw({
+//     edit: {
+//       featureGroup: drawnItems,
+//       poly: {
+//         allowIntersection: false,
+//       },
+//     },
+//     draw: {
+//       polygon: {
+//         allowIntersection: false,
+//         showArea: true,
+//       },
+//     },
+//   })
+// );
 
-  feature.type = feature.type || "Feature";
-  let props = (feature.properties = feature.properties || {});
+// map.on(L.Draw.Event.CREATED, function (event) {
+//   let layer = event.layer;
+//   let feature = (layer.feature = layer.feature || {});
+//   let type = event.layerType;
 
-  props.type = type;
+//   feature.type = feature.type || "Feature";
+//   let props = (feature.properties = feature.properties || {});
 
-  if (type === "circle") {
-    props.radius = layer.getRadius();
-  }
+//   props.type = type;
 
-  drawnItems.addLayer(layer);
-});
+//   if (type === "circle") {
+//     props.radius = layer.getRadius();
+//   }
 
-// --------------------------------------------------
-// save geojson to file
+//   drawnItems.addLayer(layer);
+// });
 
-const exportJSON = document.querySelector(".export");
+// // --------------------------------------------------
+// // save geojson to file
 
-exportJSON.addEventListener("click", () => {
-  // Extract GeoJson from featureGroup
-  const data = drawnItems.toGeoJSON();
+// const exportJSON = document.querySelector(".export");
 
-  if (data.features.length === 0) {
-    Notiflix.Notify.failure("You must have some data to save a geojson file");
-    return;
-  } else {
-    Notiflix.Notify.info("You can save the data to a geojson");
-  }
+// exportJSON.addEventListener("click", () => {
+//   // Extract GeoJson from featureGroup
+//   const data = drawnItems.toGeoJSON();
 
-  // Stringify the GeoJson
-  const convertedData =
-    "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+//   if (data.features.length === 0) {
+//     Notiflix.Notify.failure("You must have some data to save a geojson file");
+//     return;
+//   } else {
+//     Notiflix.Notify.info("You can save the data to a geojson");
+//   }
 
-  exportJSON.setAttribute("href", "data:" + convertedData);
-  exportJSON.setAttribute("download", "data.geojson");
-});
+//   // Stringify the GeoJson
+//   const convertedData =
+//     "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
 
-// --------------------------------------------------
-// save geojson to localstorage
-const saveJSON = document.querySelector(".save");
+//   exportJSON.setAttribute("href", "data:" + convertedData);
+//   exportJSON.setAttribute("download", "data.geojson");
+// });
 
-saveJSON.addEventListener("click", (e) => {
-  e.preventDefault();
+// // --------------------------------------------------
+// // save geojson to localstorage
+// const saveJSON = document.querySelector(".save");
 
-  const data = drawnItems.toGeoJSON();
+// saveJSON.addEventListener("click", (e) => {
+//   e.preventDefault();
 
-  if (data.features.length === 0) {
-    Notiflix.Notify.failure("You must have some data to save it");
-    return;
-  } else {
-    Notiflix.Notify.success("The data has been saved to localstorage");
-  }
+//   const data = drawnItems.toGeoJSON();
 
-  localStorage.setItem("geojson", JSON.stringify(data));
-});
+//   if (data.features.length === 0) {
+//     Notiflix.Notify.failure("You must have some data to save it");
+//     return;
+//   } else {
+//     Notiflix.Notify.success("The data has been saved to localstorage");
+//   }
 
-// --------------------------------------------------
-// remove gojson from localstorage
+//   localStorage.setItem("geojson", JSON.stringify(data));
+// });
 
-const removeJSON = document.querySelector(".remove");
+// // --------------------------------------------------
+// // remove gojson from localstorage
 
-removeJSON.addEventListener("click", (e) => {
-  e.preventDefault();
-  localStorage.removeItem("geojson");
+// const removeJSON = document.querySelector(".remove");
 
-  Notiflix.Notify.info("All layers have been deleted");
+// removeJSON.addEventListener("click", (e) => {
+//   e.preventDefault();
+//   localStorage.removeItem("geojson");
 
-  drawnItems.eachLayer(function (layer) {
-    drawnItems.removeLayer(layer);
-  });
-});
+//   Notiflix.Notify.info("All layers have been deleted");
 
-// --------------------------------------------------
-// load geojson from localstorage
+//   drawnItems.eachLayer(function (layer) {
+//     drawnItems.removeLayer(layer);
+//   });
+// });
 
-const geojsonFromLocalStorage = JSON.parse(localStorage.getItem("geojson"));
+// // --------------------------------------------------
+// // load geojson from localstorage
 
-function setGeojsonToMap(geojson) {
-  const feature = L.geoJSON(geojson, {
-    style: function (feature) {
-      return {
-        color: "red",
-        weight: 1,
-      };
-    },
-    pointToLayer: (feature, latlng) => {
-      if (feature.properties.type === "circle") {
-        return new L.circle(latlng, {
-          radius: feature.properties.radius,
-        });
-      } else if (feature.properties.type === "circlemarker") {
-        return new L.circleMarker(latlng, {
-          radius: 10,
-        });
-      } else {
-        return new L.Marker(latlng);
-      }
-    },
-    onEachFeature: function (feature, layer) {
-      drawnItems.addLayer(layer);
-      const coordinates = feature.geometry.coordinates.toString();
-      const result = coordinates.match(/[^,]+,[^,]+/g);
+// const geojsonFromLocalStorage = JSON.parse(localStorage.getItem("geojson"));
 
-      layer.bindPopup(
-        "<span>Coordinates:<br>" + result.join("<br>") + "</span>"
-      );
-    },
-  }).addTo(map);
+// function setGeojsonToMap(geojson) {
+//   const feature = L.geoJSON(geojson, {
+//     style: function (feature) {
+//       return {
+//         color: "red",
+//         weight: 1,
+//       };
+//     },
+//     pointToLayer: (feature, latlng) => {
+//       if (feature.properties.type === "circle") {
+//         return new L.circle(latlng, {
+//           radius: feature.properties.radius,
+//         });
+//       } else if (feature.properties.type === "circlemarker") {
+//         return new L.circleMarker(latlng, {
+//           radius: 10,
+//         });
+//       } else {
+//         return new L.Marker(latlng);
+//       }
+//     },
+//     onEachFeature: function (feature, layer) {
+//       drawnItems.addLayer(layer);
+//       const coordinates = feature.geometry.coordinates.toString();
+//       const result = coordinates.match(/[^,]+,[^,]+/g);
 
-  map.flyToBounds(feature.getBounds());
-}
+//       layer.bindPopup(
+//         "<span>Coordinates:<br>" + result.join("<br>") + "</span>"
+//       );
+//     },
+//   }).addTo(map);
 
-if (geojsonFromLocalStorage) {
-  setGeojsonToMap(geojsonFromLocalStorage);
-}
+//   map.flyToBounds(feature.getBounds());
+// }
 
-// --------------------------------------------------
-// get geojson from file
+// if (geojsonFromLocalStorage) {
+//   setGeojsonToMap(geojsonFromLocalStorage);
+// }
 
-function openFile(event) {
-  const input = event.target;
+// // --------------------------------------------------
+// // get geojson from file
 
-  const reader = new FileReader();
-  reader.onload = function () {
-    const result = reader.result;
-    const geojson = JSON.parse(result);
+// function openFile(event) {
+//   const input = event.target;
 
-    Notiflix.Notify.info("The data has been loaded from the file");
+//   const reader = new FileReader();
+//   reader.onload = function () {
+//     const result = reader.result;
+//     const geojson = JSON.parse(result);
 
-    setGeojsonToMap(geojson);
-  };
-  reader.readAsText(input.files[0]);
-}
+//     Notiflix.Notify.info("The data has been loaded from the file");
+
+//     setGeojsonToMap(geojson);
+//   };
+//   reader.readAsText(input.files[0]);
+// }

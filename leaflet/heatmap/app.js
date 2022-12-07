@@ -48,3 +48,15 @@ heatmapLayer.setData({
     max: max,
     data: sale
 });
+
+
+
+// try canvas markers to fix slowness
+// Adds a layer
+var ciLayer = L.canvasIconLayer({}).addTo(propertyHeatMap);
+
+// Marker definition
+var marker =  L.marker([58.5578, 29.0087], {icon: icon});
+
+// Adding marker to layer
+ciLayer.addMarker(marker);

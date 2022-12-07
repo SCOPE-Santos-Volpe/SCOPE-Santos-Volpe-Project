@@ -6,9 +6,15 @@
     <title>Lilo example</title>
 
 
-    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="style.css" /> -->
+
+    
+  <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script> -->
+
+
+    <link rel="stylesheet" href="style.css" />
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.0/leaflet.draw.css" />
@@ -23,6 +29,14 @@
   </head>
 
   <body>
+    <!-- try using canvas-markers plugin to fix slowness -->
+  <script src="https://unpkg.com/leaflet-canvas-marker@0.2.0"></script>
+    <script src="../node_modules/leaflet-canvas-markers/leaflet-canvas-markers.js"></script>
+    
+    <script src="https://unpkg.com/rbush@3.0.1/rbush.js"></script>
+  <script src="../node_modules/leaflet-markers-canvas/dist/leaflet-markers-canvas.js"></script>
+
+
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="icon-export" viewBox="0 0 24 24">
         <path d="M0 12c0 6.627 5.373 12 12 12s12-5.373 12-12S18.627 0 12 0 0 5.373 0 12zm17-1h-4v8h-2v-8H7l5-6 5 6z" />
@@ -102,15 +116,23 @@
         <div class="item-content" id="menu">
           <h2>Sidebar without plugins</h2>
           <div class="content">
-            Such a menu is not difficult to create on your own, you only need a
-            assumptions.<br /><br />You really don't need any plugin to do something like this.
+            Such a menu is not difficult to create on your own.<br /><br />You really don't need any plugin to do something like this.
+            <br /><br />FARS
+            <br />SDS
+            <br />OpenStreetMaps
+            <br />Census
           </div>
         </div>
         <div class="item-content" id="person">
           <h2>Person</h2>
           <div class="content">
-            person - Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Omnis, a.
+            FARS
+            <br /><br />Bike
+            <br />Pedestrian
+            <br />Drunk Driving
+            <br />School Bus involved
+            <br />Road type
+            <br />Intersection
           </div>
         </div>
         <div class="item-content" id="email">
@@ -127,7 +149,8 @@
       </div>
     </div>
 
-    <div class="marker-position"></div>
+    <!-- this was used to show latlng on the map in a textbox. don't need anymore -->
+    <!-- <div class="marker-position"></div> -->
     <div id="map"></div>
     <script src="script.js"></script>
 

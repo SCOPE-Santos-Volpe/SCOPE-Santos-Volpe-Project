@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "leaflet": "^1.9.2",
+    "leaflet": "^1.9.3",
+    "leaflet-canvas-markers": "^1.0.7",
     "leaflet-heatmap": "^1.0.0"
   },
   "devDependencies": {
