@@ -25,9 +25,6 @@ let config = {
   // fullscreenControl: true,
 };
 
-// coordinate array with popup text
-
-
 
 const pointsA = [
   [44.960020586193795,  -93.25083755493164, "point A1"],
