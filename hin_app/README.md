@@ -1,5 +1,5 @@
 To Run:
 
 ```
-browse index.html
+npm start hin_app
 ```
