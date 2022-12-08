@@ -360,6 +360,8 @@ function setStatesToMap(geojson) {
       return {
         color: "red",
         weight: 1,
+        opacity: 0.8,
+        clickable: true
       };
     },
     onEachFeature: function (feature, layer) {
@@ -367,6 +369,22 @@ function setStatesToMap(geojson) {
       layer.bindPopup(
         "<span>State Name:<br>" + state_name + "</span>"
       );
+
+      layer.on('mouseover', function () {
+        this.setStyle({
+          'fillColor': '#0000ff'
+        });
+        this.openPopup();
+      });
+      
+      layer.on('mouseout', function () {
+        this.setStyle({
+          'fillColor': '#ff0000'
+        });
+        this.closePopup(); 
+      });
+
+      
     },
   }); //.addTo(map);
   console.log("feature", feature);
