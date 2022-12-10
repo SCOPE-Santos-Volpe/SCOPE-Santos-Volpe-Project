@@ -384,13 +384,19 @@ function setStatesToMap(geojson) {
         this.closePopup(); 
       });
 
-      
+      layer.on('click', function (event) {
+        map.fitBounds(this.getBounds());
+        state_boundaries.removeLayer(feature)
+      });
+
+
     },
   }); //.addTo(map);
   console.log("feature", feature);
   state_boundaries.addLayer(feature);
   // map.flyToBounds(feature.getBounds());
 }
+
 
 d3.json('https://raw.githubusercontent.com/Santos-Volpe-SCOPE/Santos-Volpe-SCOPE-Project/app-framework/hin_app/state_data/states.geojson', function(data) {
   const geojson = data;
@@ -408,7 +414,7 @@ const overlayMaps = {
   "Pin Example": pB,
   "FARS 2020 Crashes": fars_points,
   "MPO Boundaries": mpo_boundaries,
-  "County Boundaries": county_boundaries,
+  //"County Boundaries": county_boundaries,
   "State Boundaries": state_boundaries,
   "Example Heatmap": heatmapLayer,
 };
